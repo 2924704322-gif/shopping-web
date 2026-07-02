@@ -101,12 +101,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
         Page<Product> productPage = baseMapper.selectPage(page, wrapper);
 
-        // 批量获取分类名称
+        // 批量获取分类名称（空集合时跳过，避免 IN () 语法错误）
         Set<Long> categoryIds = productPage.getRecords().stream()
                 .map(Product::getCategoryId)
                 .collect(Collectors.toSet());
-        Map<Long, String> categoryMap = categoryService.listByIds(categoryIds).stream()
-                .collect(Collectors.toMap(Category::getId, Category::getName, (a, b) -> a));
+        Map<Long, String> categoryMap = categoryIds.isEmpty()
+                ? Collections.emptyMap()
+                : categoryService.listByIds(categoryIds).stream()
+                        .collect(Collectors.toMap(Category::getId, Category::getName, (a, b) -> a));
 
         // 转换为 VO
         Page<ProductVO> voPage = new Page<>(productPage.getCurrent(), productPage.getSize(), productPage.getTotal());
