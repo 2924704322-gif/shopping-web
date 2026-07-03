@@ -35,7 +35,7 @@ const isEdit = computed(() => !!props.editData?.id)
 
 const formRef = ref(null)
 const submitting = ref(false)
-const form = reactive({ username: '', password: '', nickname: '', email: '', phone: '', gender: 0, birthday: '', status: 1 })
+const form = reactive({ username: '', password: '', nickname: '', email: '', phone: '', gender: 0, birthday: null, status: 1 })
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }, { min: 3, max: 50, message: '3-50字符', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 6, message: '至少6位', trigger: 'blur' }],
@@ -53,7 +53,7 @@ watch(() => props.visible, async (v) => {
 })
 
 function resetForm() {
-  Object.assign(form, { username: '', password: '', nickname: '', email: '', phone: '', gender: 0, birthday: '', status: 1 })
+  Object.assign(form, { username: '', password: '', nickname: '', email: '', phone: '', gender: 0, birthday: null, status: 1 })
   formRef.value?.resetFields()
 }
 
@@ -63,9 +63,9 @@ async function handleSubmit() {
   submitting.value = true
   try {
     if (isEdit.value) {
-      await updateUser(props.editData.id, { nickname: form.nickname, email: form.email, phone: form.phone, gender: form.gender, birthday: form.birthday })
+      await updateUser(props.editData.id, { nickname: form.nickname, email: form.email || '', phone: form.phone || '', gender: form.gender, birthday: form.birthday || null })
     } else {
-      await createUser({ ...form })
+      await createUser({ ...form, birthday: form.birthday || null, email: form.email || null, phone: form.phone || null })
     }
     ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
     emit('update:visible', false)

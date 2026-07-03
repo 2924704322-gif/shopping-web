@@ -5,11 +5,14 @@
         🛒 购物平台管理
       </div>
       <el-menu :default-active="route.path" router background-color="#1d1e2c" text-color="#bfcbd9" active-text-color="#409eff" style="border:none">
-        <el-menu-item index="/"><el-icon><DataAnalysis /></el-icon> 仪表盘</el-menu-item>
-        <el-menu-item index="/users"><el-icon><User /></el-icon> 用户管理</el-menu-item>
-        <el-menu-item index="/categories"><el-icon><FolderOpened /></el-icon> 分类管理</el-menu-item>
-        <el-menu-item index="/products"><el-icon><Goods /></el-icon> 商品管理</el-menu-item>
-        <el-menu-item index="/data"><el-icon><Coin /></el-icon> 数据浏览</el-menu-item>
+        <el-menu-item index="/shop"><el-icon><ShoppingCart /></el-icon> 商品浏览</el-menu-item>
+        <el-menu-item index="/cart"><el-icon><ShoppingCartFull /></el-icon> 购物车</el-menu-item>
+        <template v-if="auth.isAdmin">
+          <el-menu-item index="/users"><el-icon><User /></el-icon> 用户管理</el-menu-item>
+          <el-menu-item index="/categories"><el-icon><FolderOpened /></el-icon> 分类管理</el-menu-item>
+          <el-menu-item index="/products"><el-icon><Goods /></el-icon> 商品管理</el-menu-item>
+          <el-menu-item index="/email"><el-icon><Message /></el-icon> 邮件管理</el-menu-item>
+        </template>
       </el-menu>
     </el-aside>
     <el-container>

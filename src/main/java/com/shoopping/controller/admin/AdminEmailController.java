@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,15 +34,18 @@ public class AdminEmailController {
     @Value("${MAIL_REPORT_TO:admin@example.com}")
     private String reportTo;
 
-    /** 手动触发日报发送（测试用，直接暴露邮件错误） */
-    @PostMapping("/send-report")
-    public Result<String> sendReport() {
-        long userCount = userService.count();
-        long productCount = productService.count();
-        long onShelfCount = productService.lambdaQuery()
-                .eq(Product::getStatus, 1).count();
+    /** 预览报表内容（不发送） */
+    @GetMapping("/preview")
+    public Result<java.util.Map<String, Object>> preview() {
+        return Result.success(java.util.Map.of(
+            "to", reportTo,
+            "subject", "【购物平台】每日数据报表",
+            "content", generateReport()
+        ));
+    }
 
-        String content = String.format("""
+    private String generateReport() {
+        return String.format("""
                 购物平台每日数据报表
                 ====================
                 统计时间: %s
@@ -58,14 +62,21 @@ public class AdminEmailController {
                 """,
                 java.time.LocalDateTime.now()
                         .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                userCount, productCount, onShelfCount, productCount - onShelfCount);
+                userService.count(),
+                productService.count(),
+                productService.lambdaQuery().eq(Product::getStatus, 1).count(),
+                productService.count() - productService.lambdaQuery().eq(Product::getStatus, 1).count());
+    }
 
+    /** 手动触发日报发送 */
+    @PostMapping("/send-report")
+    public Result<String> sendReport() {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("2924704322@qq.com");
             message.setTo(reportTo);
             message.setSubject("【购物平台】每日数据报表");
-            message.setText(content);
+            message.setText(generateReport());
             mailSender.send(message);
             log.info("邮件发送成功 -> {}", reportTo);
             return Result.success("邮件已发送至 " + reportTo);

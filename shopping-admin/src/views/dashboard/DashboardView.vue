@@ -16,8 +16,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { getUserPage } from '@/api/user'
-import { getAdminProductPage } from '@/api/product'
+import request from '@/api/request'
 
 const auth = useAuthStore()
 const cards = ref([
@@ -29,14 +28,10 @@ const cards = ref([
 
 onMounted(async () => {
   try {
-    const [users, products, onShelf] = await Promise.all([
-      getUserPage({ pageNum: 1, pageSize: 1 }),
-      getAdminProductPage({ pageNum: 1, pageSize: 1 }),
-      getAdminProductPage({ pageNum: 1, pageSize: 1, status: 1 }),
-    ])
-    cards.value[0].count = users.data.total
-    cards.value[1].count = products.data.total
-    cards.value[2].count = onShelf.data.total
+    const res = await request({ url: '/dashboard/stats', method: 'get' })
+    cards.value[0].count = res.data.userCount
+    cards.value[1].count = res.data.productCount
+    cards.value[2].count = res.data.onShelfCount
   } catch {}
 })
 </script>

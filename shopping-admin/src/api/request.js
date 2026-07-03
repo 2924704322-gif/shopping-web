@@ -21,7 +21,7 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.message || '请求失败')
-      if (res.code === 401 || res.code === 403) {
+      if (res.code === 401) {
         removeToken(); removeUserInfo()
         window.location.href = '/login.html'
       }
