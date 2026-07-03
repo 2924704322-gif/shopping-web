@@ -9,6 +9,7 @@
         <el-menu-item index="/users"><el-icon><User /></el-icon> 用户管理</el-menu-item>
         <el-menu-item index="/categories"><el-icon><FolderOpened /></el-icon> 分类管理</el-menu-item>
         <el-menu-item index="/products"><el-icon><Goods /></el-icon> 商品管理</el-menu-item>
+        <el-menu-item index="/data"><el-icon><Coin /></el-icon> 数据浏览</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

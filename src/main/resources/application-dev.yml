@@ -18,6 +18,13 @@ spring:
       port: 6379
       database: 0
 
+  mail:
+    username: 2924704322@qq.com
+    password: xcsslwhfqjmfdhba
+
+# 邮件报表收件人
+MAIL_REPORT_TO: 2924704322@qq.com
+
 # 开发环境：打印 SQL 到控制台，方便调试
 mybatis-plus:
   configuration:

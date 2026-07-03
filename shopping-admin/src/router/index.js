@@ -9,6 +9,7 @@ const routes = [{
     { path: 'users', name: 'UserList', component: () => import('@/views/user/UserListView.vue'), meta: { title: '用户管理' } },
     { path: 'categories', name: 'CategoryList', component: () => import('@/views/category/CategoryListView.vue'), meta: { title: '分类管理' } },
     { path: 'products', name: 'ProductList', component: () => import('@/views/product/ProductListView.vue'), meta: { title: '商品管理' } },
+    { path: 'data', name: 'DataBrowse', component: () => import('@/views/data/DataBrowseView.vue'), meta: { title: '数据浏览' } },
   ]
 }]
 

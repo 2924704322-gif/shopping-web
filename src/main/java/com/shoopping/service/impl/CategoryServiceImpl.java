@@ -14,6 +14,7 @@ import com.shoopping.model.common.PageParam;
 import com.shoopping.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
 
     private final ProductMapper productMapper;
+    private final CacheManager cacheManager;
 
     @Override
     @Cacheable(value = "categoryTree", unless = "#result == null || #result.isEmpty()")
@@ -132,6 +134,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         }
 
         updateById(category);
+        // 分类名变更后，清除关联商品的详情缓存
+        evictProductDetailCache(id);
     }
 
     @Override
@@ -168,5 +172,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         }
         category.setStatus(status);
         updateById(category);
+        // 分类状态变更后，清除关联商品的详情缓存
+        evictProductDetailCache(id);
+    }
+
+    /**
+     * 清除指定分类下所有商品的 productDetail 缓存
+     * 防止分类名变更/状态变更后，商品详情缓存中仍然展示旧的分类信息
+     */
+    private void evictProductDetailCache(Long categoryId) {
+        var productCache = cacheManager.getCache("productDetail");
+        if (productCache == null) return;
+        List<Long> productIds = productMapper.selectList(
+                new LambdaQueryWrapper<Product>().eq(Product::getCategoryId, categoryId))
+                .stream().map(Product::getId).toList();
+        for (Long pid : productIds) {
+            productCache.evict(pid);
+        }
     }
 }

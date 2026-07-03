@@ -80,6 +80,7 @@ public class DailyReportTask {
      */
     private void sendEmail(String to, String subject, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("2924704322@qq.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(content);
